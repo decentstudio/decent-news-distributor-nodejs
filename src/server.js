@@ -1,12 +1,21 @@
 import express from 'express';
+import log from 'npmlog';
+import config from './config';
 
 const app = express();
+const logPrefix = 'server';
 
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
-const server = app.listen(8081, () => {
-  const port = server.address().port;
-  console.log(`Server listening on port ${port}.`);
-});
+app.listen(config.HTTP_PORT, (app, err) => onStart(config.HTTP_PORT, app, err)); 
+
+function onStart(port, app, err) {
+  if (!err) {
+    log.info(logPrefix, `Server listening on port ${port}.`);
+  }
+  else {
+    log.error(logPrefix, err);
+  }
+}
