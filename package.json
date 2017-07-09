@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/decentstudio/decent-news-distributor-nodejs#readme",
   "dependencies": {
+    "amqplib": "^0.5.1",
     "body-parser": "^1.17.2",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",

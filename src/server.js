@@ -1,7 +1,8 @@
 import express from 'express';
 import log from 'npmlog';
-import config from './config';
 import slackRouter from './slack-router';
+import broker from './broker';
+require('dotenv').config();
 
 const app = express();
 const logPrefix = `server (${new Date()}): `;
@@ -12,7 +13,16 @@ app.get('/', (req, res) => {
 
 app.use('/slack', slackRouter);
 
-app.listen(config.HTTP_PORT, (app, err) => onStart(config.HTTP_PORT, app, err)); 
+broker.connect().then(broker => {
+  app.use((req, res, next) => {
+    req.broker = broker;
+    next();
+  });
+
+  app.listen(
+    process.env.HTTP_PORT,
+    (app, err) => onStart(process.env.HTTP_PORT, app, err));
+});
 
 function onStart(port, app, err) {
   if (!err) {
@@ -22,3 +32,5 @@ function onStart(port, app, err) {
     log.error(logPrefix, err);
   }
 }
+
+
