@@ -48,6 +48,7 @@ function connect() {
 
 function processMessage(msg) {
   log.info('Server', `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
+  // TODO: add message to cache
 }
 
 const broker = {
