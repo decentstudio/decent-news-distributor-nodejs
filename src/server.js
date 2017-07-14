@@ -14,10 +14,7 @@ app.get('/', (req, res) => {
 app.use('/slack', slackRouter);
 
 broker.connect().then(broker => {
-  app.use((req, res, next) => {
-    req.broker = broker;
-    next();
-  });
+  // TODO: start consuming here and print to test
 
   app.listen(
     process.env.HTTP_PORT,

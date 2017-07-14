@@ -33,7 +33,7 @@ function connect() {
         return conn.createChannel();
       }).then(ch => {
         channel = ch;
-        return channel.assertQueue('');
+        return channel.assertQueue('', { exclusive: true });
       }).then(q => {
         const ex = 'amq.topic';
         // bind to topics we are interested in here
