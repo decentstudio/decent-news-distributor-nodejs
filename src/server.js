@@ -4,26 +4,27 @@ import slackRouter from './slack-router';
 import broker from './broker';
 require('dotenv').config();
 
-const app = express();
-const logPrefix = `server (${new Date()}): `;
+const logPrefix = `Server: `;
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
+broker.connect().then(configureServer);
 
-app.use('/slack', slackRouter);
+function configureServer() {
+  const app = express();
 
-broker.connect().then(broker => {
-  // TODO: start consuming here and print to test
+  app.get('/', (req, res) => {
+    res.send('Hello World');
+  });
+
+  app.use('/slack', slackRouter);
 
   app.listen(
     process.env.HTTP_PORT,
-    (app, err) => onStart(process.env.HTTP_PORT, app, err));
-});
+    (app, err) => onServerStart(process.env.HTTP_PORT, app, err));
+}
 
-function onStart(port, app, err) {
+function onServerStart(port, app, err) {
   if (!err) {
-    log.info(logPrefix, `Server listening on port ${port}.`);
+    log.info(logPrefix, `Listening on port ${port}.`);
   }
   else {
     log.error(logPrefix, err);

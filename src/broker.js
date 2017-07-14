@@ -34,13 +34,20 @@ function connect() {
       }).then(ch => {
         channel = ch;
         return channel.assertQueue('', { exclusive: true });
-      }).then(q => {
+      }).then(response => {
         const ex = 'amq.topic';
         // bind to topics we are interested in here
-        channel.bindQueue(q.queue, ex, 'slack.event.message');
-        resolve({ consume: channel.consume.bind(null, q.queue) });
+        channel.bindQueue(response.queue, ex, 'slack.event.message');
+
+        channel.consume(response.queue, processMessage);
+
+        resolve();
       });
   });
+}
+
+function processMessage(msg) {
+  log.info('Server', `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
 }
 
 const broker = {
