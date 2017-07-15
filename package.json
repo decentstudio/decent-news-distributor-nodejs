@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel src -d dist",
-    "start": "node dist/server.js",
+    "start": "node dist/app.js",
     "build-start": "npm run build && npm run start",
     "watch": "npm-watch build-start"
   },
@@ -27,6 +27,7 @@
     "body-parser": "^1.17.2",
     "dotenv": "^4.0.0",
     "express": "^4.15.3",
+    "lodash": "^4.17.4",
     "npmlog": "^4.1.2"
   },
   "devDependencies": {

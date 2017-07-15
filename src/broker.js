@@ -33,13 +33,16 @@ function connect() {
         return conn.createChannel();
       }).then(ch => {
         channel = ch;
-        return channel.assertQueue('', { exclusive: true });
+        return channel.assertQueue('', { exclusive: true});
       }).then(response => {
         const ex = 'amq.topic';
         // bind to topics we are interested in here
         channel.bindQueue(response.queue, ex, 'slack.event.message');
 
-        channel.consume(response.queue, processMessage);
+        channel.consume(
+          response.queue, 
+          processMessage,
+          {noAck: true});
 
         resolve();
       });

@@ -2,22 +2,35 @@ import express from 'express';
 import log from 'npmlog';
 import slackRouter from './slack-router';
 import broker from './broker';
+import flow from 'lodash/fp/flow';
 require('dotenv').config();
 
 const logPrefix = `Server: `;
 
-broker.connect().then(configureServer);
+broker.connect().then(() =>
+  flow([
+    createServer,
+    configureServer,
+    startServer
+  ])()
+);
 
-function configureServer() {
-  const app = express();
+function createServer() {
+  return express();
+}
 
+function configureServer(app) {
   app.get('/', (req, res) => {
     res.send('Hello World');
   });
 
   app.use('/slack', slackRouter);
 
-  app.listen(
+  return app;
+}
+
+function startServer(app) {
+  return app.listen(
     process.env.HTTP_PORT,
     (app, err) => onServerStart(process.env.HTTP_PORT, app, err));
 }
