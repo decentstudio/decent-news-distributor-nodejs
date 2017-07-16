@@ -1,25 +1,33 @@
+require('dotenv').config();
 import express from 'express';
 import log from 'npmlog';
 import slackRouter from './slack-router';
 import broker from './broker';
 import flow from 'lodash/fp/flow';
-require('dotenv').config();
+import Server from 'socket.io';
+import { List } from 'immutable';
 
 const logPrefix = `Server: `;
+let sockets = List();
 
-broker.connect().then(() =>
+
+broker.connect().then((broker) => {
+  broker.consume(processQueueMessage);
+  
   flow([
-    createServer,
-    configureServer,
-    startServer
+    createHttpServer,
+    configureHttpServer,
+    startHttpServer,
+    createSocketServer,
+    configureSocketServer
   ])()
-);
+});
 
-function createServer() {
+function createHttpServer() {
   return express();
 }
 
-function configureServer(app) {
+function configureHttpServer(app) {
   app.get('/', (req, res) => {
     res.send('Hello World');
   });
@@ -29,13 +37,13 @@ function configureServer(app) {
   return app;
 }
 
-function startServer(app) {
+function startHttpServer(app) {
   return app.listen(
     process.env.HTTP_PORT,
-    (app, err) => onServerStart(process.env.HTTP_PORT, app, err));
+    (app, err) => onHttpServerStart(process.env.HTTP_PORT, app, err));
 }
 
-function onServerStart(port, app, err) {
+function onHttpServerStart(port, app, err) {
   if (!err) {
     log.info(logPrefix, `Listening on port ${port}.`);
   }
@@ -43,5 +51,27 @@ function onServerStart(port, app, err) {
     log.error(logPrefix, err);
   }
 }
+
+function createSocketServer(httpServer) {
+  return new Server(httpServer);
+}
+
+function configureSocketServer(socketServer) {
+  socketServer.on('connection', (socket) => {
+    console.log('Connection made to socket server');
+    socket.emit('message', {hello: 'world'});
+    sockets = sockets.push(socket);
+    console.log('sockets list size:', sockets.size);
+  });
+  return socketServer;
+}
+
+function processQueueMessage(msg) {
+  log.info('Server', `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
+  sockets.forEach((socket) => {
+    socket.emit('message', msg.content.toString());
+  });
+}
+
 
 

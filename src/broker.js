@@ -26,7 +26,7 @@ function connect() {
       vhost: process.env.RABBITMQ_VHOST
     };
 
-    let channel;
+    let channel = null;
 
     amqplib.connect(getConnectionUrl(logConnectionAttempt(config)))
       .then(conn => {
@@ -36,22 +36,12 @@ function connect() {
         return channel.assertQueue('', { exclusive: true});
       }).then(response => {
         const ex = 'amq.topic';
-        // bind to topics we are interested in here
+        // Bind to topics we are interested in here. Refactor topics into config file for easy addition/removal.
         channel.bindQueue(response.queue, ex, 'slack.event.message');
 
-        channel.consume(
-          response.queue, 
-          processMessage,
-          {noAck: true});
-
-        resolve();
+        resolve({ consume: (callback, options) => channel.consume(response.queue, callback, {noAck: true}) });
       });
   });
-}
-
-function processMessage(msg) {
-  log.info('Server', `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
-  // TODO: add message to cache
 }
 
 const broker = {
