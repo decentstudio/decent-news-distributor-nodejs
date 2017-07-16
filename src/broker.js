@@ -39,7 +39,11 @@ function connect() {
         // Bind to topics we are interested in here. Refactor topics into config file for easy addition/removal.
         channel.bindQueue(response.queue, ex, 'slack.event.message');
 
-        resolve({ consume: (callback, options) => channel.consume(response.queue, callback, {noAck: true}) });
+        resolve({ 
+          consume: (callback, options) => {
+            channel.consume(response.queue, callback, {noAck: true})
+          }
+        });
       });
   });
 }

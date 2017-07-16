@@ -10,10 +10,9 @@ import { List } from 'immutable';
 const logPrefix = `Server: `;
 let sockets = List();
 
-
 broker.connect().then((broker) => {
   broker.consume(processQueueMessage);
-  
+
   flow([
     createHttpServer,
     configureHttpServer,
@@ -58,16 +57,15 @@ function createSocketServer(httpServer) {
 
 function configureSocketServer(socketServer) {
   socketServer.on('connection', (socket) => {
-    console.log('Connection made to socket server');
-    socket.emit('message', {hello: 'world'});
+    socket.emit('message', { hello: 'world' });
     sockets = sockets.push(socket);
-    console.log('sockets list size:', sockets.size);
   });
   return socketServer;
 }
 
 function processQueueMessage(msg) {
-  log.info('Server', `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
+  log.info(null, `Message from ${msg.fields.routingKey}: ${msg.content.toString()}`);
+
   sockets.forEach((socket) => {
     socket.emit('message', msg.content.toString());
   });
