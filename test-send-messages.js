@@ -2,7 +2,7 @@ const amqp = require('amqplib');
 
 const ex = 'amq.topic';
 const key = 'slack.event.message';
-const messagesPerSecond = 1;
+const messagesPerSecond = 10;
 
 amqp.connect('amqp://localhost').then(conn => {
   return conn.createChannel();
