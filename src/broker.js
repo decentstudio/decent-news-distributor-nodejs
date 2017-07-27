@@ -1,5 +1,6 @@
-import amqplib from 'amqplib'
-import log from 'npmlog'
+import amqplib from 'amqplib';
+import log from 'npmlog';
+import topics from './topics';
 
 function getConnectionUrl({ user, pass, host, port, vhost }) {
   return `amqp://${user}:${pass}@${host}:${port}${vhost}`;
@@ -36,8 +37,9 @@ function connect() {
         return channel.assertQueue('', { exclusive: true});
       }).then(response => {
         const ex = 'amq.topic';
-        // Bind to topics we are interested in here. Refactor topics into config file for easy addition/removal.
-        channel.bindQueue(response.queue, ex, 'slack.event.message');
+        
+        // Bind to topics
+        topics.forEach(topic => channel.bindQueue(response.queue, ex, topic));
 
         resolve({ 
           consume: (callback, options) => {
