@@ -1,12 +1,6 @@
 # decent-news-distributor-nodejs
 This service passes information from the queue to client applications.
 
-## Commands
-- `npm run build` - builds the project
-- `npm run start`- builds the project (must be run after build has been run first time)
-- `npm run build-start` - builds then starts the project
-- `npm run watch` - starts the project and rebuilds/restarts when changes are made
-
 ## Development Guide
 To run and make changes to this service locally: 
 
@@ -17,3 +11,9 @@ To run and make changes to this service locally:
 
 3. Run the distributor app in watch mode so any changes your make will cause the app to be rebuilt and restarted.
     - `npm run watch`
+    
+## Commands
+- `npm run build` - builds the project
+- `npm run start`- builds the project (must be run after build has been run first time)
+- `npm run build-start` - builds then starts the project
+- `npm run watch` - starts the project and rebuilds/restarts when changes are made
